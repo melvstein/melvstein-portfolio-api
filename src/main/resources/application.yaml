@@ -12,4 +12,8 @@ spring:
   flyway:
     enabled: true
     baseline-on-migrate: true
-    clean-disabled: false
+    clean-disabled: true
+  datasource:
+    url: jdbc:postgresql://${POSTGRES_HOST:localhost}:${POSTGRES_PORT:5432}/melvstein_portfolio_db
+    username: ${POSTGRES_USER:postgres}
+    password: ${POSTGRES_PASSWORD:postgres}
