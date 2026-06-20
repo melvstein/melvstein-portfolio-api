@@ -1,3 +1,15 @@
 spring:
   application:
     name: melvstein-portfolio-api
+  security:
+    user:
+      name: melvstein
+      password: melvstein0424
+  jpa:
+    hibernate:
+      ddl-auto: validate # IMPORTANT when using flyway, set this to validate to avoid conflicts with the database schema
+    show-sql: true
+  flyway:
+    enabled: true
+    baseline-on-migrate: true
+    clean-disabled: false
