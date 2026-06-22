@@ -123,7 +123,7 @@ public class MelvsteinPortfolioApiApplication {
     public static void tutorial() throws JsonProcessingException {
         ObjectMapper objectMapper = new ObjectMapper();
 
-        // ArrayList
+        // ArrayList - is a dynamic array that grows automatically. It allows duplicate elements and maintains the order of insertion. It is not synchronized.
         List<String> cars = new ArrayList<>();
         cars.add("BMW");
         cars.add("Volvo");
@@ -141,7 +141,7 @@ public class MelvsteinPortfolioApiApplication {
 
         System.out.println(cars);
 
-        // LinkedList
+        // LinkedList - is a list made of connected nodes. Allows duplicates
         List<Number> nums = new LinkedList<>();
         nums.add(1);
         nums.add(2);
@@ -150,7 +150,7 @@ public class MelvsteinPortfolioApiApplication {
         nums.addFirst(0);
         System.out.println(nums);
 
-        // HashSet
+        // HashSet - Stores unique values using hashing. Not allows duplication. Order unpredictable
         Set<Number> set = new HashSet<>();
         set.add(1);
         set.add(2);
@@ -162,7 +162,9 @@ public class MelvsteinPortfolioApiApplication {
 
         System.out.println(set1);
 
-        // TreeSet
+        // LinkedHashSet - Stores unique values using hashing. Not allows duplication. Maintains insertion order
+
+        // TreeSet - Set that automatically sorts values. Not allows duplication. Automatically sorted
         Set<String> treeSet = new TreeSet<>();
         treeSet.add("BMW");
         treeSet.add("Volvo");
@@ -182,7 +184,7 @@ public class MelvsteinPortfolioApiApplication {
 
         System.out.println(linkedHashSet);
 
-        // HashMap
+        // HashMap - Stores key-value pairs using hashing. Key not allows duplication, but values allows duplication. Order unpredictable
         Map<String, Object> hashMap = new HashMap<>();
         hashMap.put("key1", "value1");
         hashMap.put("key2", 2);
@@ -192,7 +194,9 @@ public class MelvsteinPortfolioApiApplication {
 
         System.out.println(json);
 
-        // TreeMap
+        // LinkedHashMap - HashMap that maintains insertion order. Key not allows duplication, but values allows duplication.
+
+        // TreeMap - Map that automatically sorts keys
         Map<String, String> treeMap = new TreeMap<>();
         treeMap.put("key3", "value1");
         treeMap.put("key2", "value2");
