@@ -1,5 +1,6 @@
 package dev.melvstein.portfolio.api.common.exception;
 
+import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.exc.InvalidFormatException;
 import dev.melvstein.portfolio.api.base.vo.BaseResponseVo;
 import dev.melvstein.portfolio.api.base.vo.ErrorResponseVo;
@@ -9,6 +10,9 @@ import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
+import java.util.Arrays;
+import java.util.stream.Collectors;
+
 @RestControllerAdvice
 public class GlobalExceptionHandler {
 
@@ -17,12 +21,25 @@ public class GlobalExceptionHandler {
         if (e.getCause() instanceof InvalidFormatException ife
                 && ife.getTargetType().isEnum()) {
 
-            String field = ife.getPath().getFirst().getFieldName();
+            String fieldName = ife.getPath().stream()
+                    .findFirst()
+                    .map(JsonMappingException.Reference::getFieldName)
+                    .orElse("field");
+
+            String allowedValues = Arrays.stream(
+                            ife.getTargetType().getEnumConstants()
+                    )
+                    .map(Object::toString)
+                    .collect(Collectors.joining(", "));
 
             return ResponseEntity.badRequest()
                     .body(ErrorResponseVo.builder()
                             .code(HttpStatus.BAD_REQUEST.value())
-                            .message("Invalid value for field: " + field)
+                            .message(String.format(
+                                    "%s must be one of: %s",
+                                    fieldName,
+                                    allowedValues
+                            ))
                             .build());
         }
 
