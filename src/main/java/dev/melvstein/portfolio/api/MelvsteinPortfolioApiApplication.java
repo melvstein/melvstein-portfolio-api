@@ -5,6 +5,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.data.jpa.repository.config.EnableJpaAuditing;
 
 import java.net.URI;
 import java.net.http.HttpClient;
@@ -12,6 +13,7 @@ import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 import java.util.*;
 
+@EnableJpaAuditing
 @SpringBootApplication
 public class MelvsteinPortfolioApiApplication {
 
@@ -31,9 +33,9 @@ public class MelvsteinPortfolioApiApplication {
 
         List<String> result = getMovieTitles("spiderman");
 
-        for (String title : result) {
+        /*for (String title : result) {
             System.out.println(title);
-        }
+        }*/
 	}
 
     public static List<String> getMovieTitles(String substr) throws Exception {
