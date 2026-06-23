@@ -17,3 +17,7 @@ spring:
     url: jdbc:postgresql://${POSTGRES_HOST:localhost}:${POSTGRES_PORT:5432}/melvstein_portfolio_db
     username: ${POSTGRES_USER:postgres}
     password: ${POSTGRES_PASSWORD:postgres}
+  config:
+    import: optional:file:.env[.properties]
+app:
+  api-key: ${API_KEY:test}

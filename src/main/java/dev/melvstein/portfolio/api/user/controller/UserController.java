@@ -4,16 +4,15 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import dev.melvstein.portfolio.api.base.controller.BaseController;
 import dev.melvstein.portfolio.api.user.dto.UserCreateRequestDto;
 import dev.melvstein.portfolio.api.user.dto.UserDto;
+import dev.melvstein.portfolio.api.user.enm.ResponseCodeEnum;
 import dev.melvstein.portfolio.api.user.service.UserService;
 import dev.melvstein.portfolio.api.user.vo.UserResponseVo;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindingResult;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/api/v1/users")
@@ -25,6 +24,7 @@ public class UserController extends BaseController {
     @PostMapping
     public ResponseEntity<UserResponseVo> createUser(
             @Valid @RequestBody UserCreateRequestDto request,
+            @RequestHeader(value = "X-API-Key", required = false) String apiKey,
             BindingResult bindingResult
     ) throws JsonProcessingException {
         if  (bindingResult.hasErrors()) {
@@ -33,6 +33,26 @@ public class UserController extends BaseController {
                     request,
                     UserResponseVo::error
             );
+        }
+
+        if (apiKey == null || apiKey.isBlank()) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                    .body(
+                            UserResponseVo.error(
+                                    ResponseCodeEnum.UNAUTHORIZED.getCode(),
+                                    "Header X-API-Key is required"
+                            )
+                    );
+        }
+
+        if (!userService.verifyApiKey(apiKey)) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                    .body(
+                            UserResponseVo.error(
+                                    ResponseCodeEnum.UNAUTHORIZED.getCode(),
+                                    "Invalid header X-API-Key"
+                            )
+                    );
         }
 
         return handleResponse(request, userService::createUser, UserResponseVo::error);
