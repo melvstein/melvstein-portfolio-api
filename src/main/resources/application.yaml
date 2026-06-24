@@ -19,6 +19,8 @@ spring:
     password: ${POSTGRES_PASSWORD:postgres}
   config:
     import: optional:file:.env[.properties]
+  jackson:
+    time-zone: Asia/Manila
 app:
   api-key: ${API_KEY:test}
 jwt:
