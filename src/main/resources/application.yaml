@@ -21,3 +21,6 @@ spring:
     import: optional:file:.env[.properties]
 app:
   api-key: ${API_KEY:test}
+jwt:
+  secret: ${JWT_SECRET:test}
+  expiration: ${JWT_EXPIRATION:3600000} # 1 hour in milliseconds

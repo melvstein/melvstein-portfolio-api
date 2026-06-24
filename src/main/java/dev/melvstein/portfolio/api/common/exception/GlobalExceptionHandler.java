@@ -2,8 +2,8 @@ package dev.melvstein.portfolio.api.common.exception;
 
 import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.exc.InvalidFormatException;
-import dev.melvstein.portfolio.api.base.vo.BaseResponseVo;
-import dev.melvstein.portfolio.api.base.vo.ErrorResponseVo;
+import dev.melvstein.portfolio.api.domain.base.vo.BaseResponseVo;
+import dev.melvstein.portfolio.api.domain.base.vo.DefaultResponseVo;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.HttpMessageNotReadableException;
@@ -33,7 +33,7 @@ public class GlobalExceptionHandler {
                     .collect(Collectors.joining(", "));
 
             return ResponseEntity.badRequest()
-                    .body(ErrorResponseVo.builder()
+                    .body(DefaultResponseVo.builder()
                             .code(HttpStatus.BAD_REQUEST.value())
                             .message(String.format(
                                     "%s must be one of: %s",
@@ -44,7 +44,7 @@ public class GlobalExceptionHandler {
         }
 
         return ResponseEntity.badRequest()
-                .body(ErrorResponseVo.builder()
+                .body(DefaultResponseVo.builder()
                         .code(HttpStatus.BAD_REQUEST.value())
                         .message("Invalid request payload")
                         .build());
