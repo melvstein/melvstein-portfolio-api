@@ -5,6 +5,8 @@ import dev.melvstein.portfolio.api.domain.user.enm.RoleEnum;
 import dev.melvstein.portfolio.api.domain.user.enm.StatusEnum;
 import lombok.Builder;
 
+import java.io.Serial;
+import java.io.Serializable;
 import java.util.Date;
 
 @Builder
@@ -25,5 +27,8 @@ public record UserDto(
 
         @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
         Date updatedAt
-) {
+) implements Serializable {
+
+    @Serial
+    private static final long serialVersionUID = 1L;
 }

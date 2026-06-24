@@ -1,31 +1,31 @@
 package dev.melvstein.portfolio.api.domain.auth.vo;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
-import dev.melvstein.portfolio.api.domain.base.vo.BaseResponseVo;
-import dev.melvstein.portfolio.api.domain.user.dto.UserDto;
 import dev.melvstein.portfolio.api.common.enm.ResponseCodeEnum;
+import dev.melvstein.portfolio.api.domain.base.vo.BaseResponseVo;
 import lombok.Builder;
 
 @Builder
 @JsonInclude(JsonInclude.Include.NON_EMPTY)
-public record AuthRegisterResponseVo(
+public record AuthLoginResponseVo(
+
         int code,
         String message,
-        UserDto data
+        String token
 ) implements BaseResponseVo {
 
-    public static AuthRegisterResponseVo error(int code, String message) {
-        return AuthRegisterResponseVo.builder()
+    public static AuthLoginResponseVo error(int code, String message) {
+        return AuthLoginResponseVo.builder()
                 .code(code)
                 .message(message)
                 .build();
     }
 
-    public static AuthRegisterResponseVo response(ResponseCodeEnum responseCodeEnum, UserDto data) {
-        return AuthRegisterResponseVo.builder()
+    public static AuthLoginResponseVo response(ResponseCodeEnum responseCodeEnum, String token) {
+        return AuthLoginResponseVo.builder()
                 .code(responseCodeEnum.getCode())
                 .message(responseCodeEnum.getMessage())
-                .data(data)
+                .token(token)
                 .build();
     }
 }

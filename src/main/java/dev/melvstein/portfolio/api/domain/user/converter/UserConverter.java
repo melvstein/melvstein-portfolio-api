@@ -1,15 +1,21 @@
 package dev.melvstein.portfolio.api.domain.user.converter;
 
-import dev.melvstein.portfolio.api.common.Utils;
 import dev.melvstein.portfolio.api.domain.user.dto.UserCreateRequestDto;
 import dev.melvstein.portfolio.api.domain.user.dto.UserDto;
 import dev.melvstein.portfolio.api.domain.user.entity.User;
+import lombok.RequiredArgsConstructor;
+import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.stereotype.Component;
 
 import java.util.Date;
 
+@Component
+@RequiredArgsConstructor
 public class UserConverter {
 
-    public static UserDto toDto(User user) {
+    private final PasswordEncoder passwordEncoder;
+
+    public UserDto toDto(User user) {
         if (user == null) {
             return null;
         }
@@ -29,7 +35,7 @@ public class UserConverter {
                 .build();
     }
 
-    public static User toEntity(UserDto dto) {
+    public User toEntity(UserDto dto) {
         if (dto == null) {
             return null;
         }
@@ -49,12 +55,12 @@ public class UserConverter {
                 .build();
     }
     
-    public static User toEntity(UserCreateRequestDto request) {
+    public User toEntity(UserCreateRequestDto request) {
         if (request == null) {
             return null;
         }
 
-        String password = Utils.bCryptPasswordEncoder().encode(request.password());
+        String password = passwordEncoder.encode(request.password());
 
         return User.builder()
                 .role(request.role())

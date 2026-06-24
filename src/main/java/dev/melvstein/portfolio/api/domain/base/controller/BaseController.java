@@ -2,8 +2,9 @@ package dev.melvstein.portfolio.api.domain.base.controller;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import dev.melvstein.portfolio.api.common.exception.ApiException;
 import dev.melvstein.portfolio.api.domain.base.vo.BaseResponseVo;
-import dev.melvstein.portfolio.api.domain.user.enm.ResponseCodeEnum;
+import dev.melvstein.portfolio.api.common.enm.ResponseCodeEnum;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.ResponseEntity;
@@ -51,6 +52,14 @@ public abstract class BaseController {
                     .body(errorFactory.apply(
                             ResponseCodeEnum.DUPLICATE_ENTRY.getCode(),
                             ResponseCodeEnum.DUPLICATE_ENTRY.getMessage())
+                    );
+        } catch (ApiException e) {
+            log.error("handleResponse - AppException", e);
+
+            response = ResponseEntity.status(e.getHttpStatus())
+                    .body(errorFactory.apply(
+                            e.getCode(),
+                            e.getMessage())
                     );
         } catch (Exception e) {
             log.error("handleResponse", e);

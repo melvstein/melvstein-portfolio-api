@@ -26,3 +26,8 @@ app:
 jwt:
   secret: ${JWT_SECRET:test}
   expiration: ${JWT_EXPIRATION:3600000} # 1 hour in milliseconds
+redis:
+  expiration:
+    refresh-token: ${REDIS_REFRESH_TOKEN_EXPIRATION:604800000} # 7 days in milliseconds
+    user: ${REDIS_USER_EXPIRATION:3600000} # 1 hour in milliseconds
+    jwt-token: ${REDIS_JWT_TOKEN_EXPIRATION:3600000} # 1 hour in milliseconds
