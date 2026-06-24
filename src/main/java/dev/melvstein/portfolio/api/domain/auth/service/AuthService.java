@@ -9,7 +9,6 @@ import dev.melvstein.portfolio.api.domain.user.dto.UserDto;
 import dev.melvstein.portfolio.api.domain.user.enm.ResponseCodeEnum;
 import dev.melvstein.portfolio.api.domain.user.entity.User;
 import dev.melvstein.portfolio.api.domain.user.repository.UserRepository;
-import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
