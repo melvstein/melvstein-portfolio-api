@@ -11,7 +11,7 @@ public record AuthLoginResponseVo(
 
         int code,
         String message,
-        String token
+        Data data
 ) implements BaseResponseVo {
 
     public static AuthLoginResponseVo error(int code, String message) {
@@ -21,11 +21,20 @@ public record AuthLoginResponseVo(
                 .build();
     }
 
-    public static AuthLoginResponseVo response(ResponseCodeEnum responseCodeEnum, String token) {
+    public static AuthLoginResponseVo response(ResponseCodeEnum responseCodeEnum, Data data) {
         return AuthLoginResponseVo.builder()
                 .code(responseCodeEnum.getCode())
                 .message(responseCodeEnum.getMessage())
-                .token(token)
+                .data(data)
                 .build();
+    }
+
+    @Builder
+    public record Data(
+
+            String accessToken,
+            String refreshToken
+    ) {
+
     }
 }

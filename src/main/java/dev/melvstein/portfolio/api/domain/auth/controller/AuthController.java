@@ -4,9 +4,11 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import dev.melvstein.portfolio.api.common.Utils;
 import dev.melvstein.portfolio.api.common.security.service.SecurityService;
 import dev.melvstein.portfolio.api.domain.auth.dto.AuthLoginRequestDto;
+import dev.melvstein.portfolio.api.domain.auth.dto.AuthRefreshTokenRequestDto;
 import dev.melvstein.portfolio.api.domain.auth.dto.AuthRegisterRequestDto;
 import dev.melvstein.portfolio.api.domain.auth.service.AuthService;
 import dev.melvstein.portfolio.api.domain.auth.vo.AuthLoginResponseVo;
+import dev.melvstein.portfolio.api.domain.auth.vo.AuthRefreshTokenResponseVo;
 import dev.melvstein.portfolio.api.domain.auth.vo.AuthRegisterResponseVo;
 import dev.melvstein.portfolio.api.domain.base.controller.BaseController;
 import dev.melvstein.portfolio.api.common.enm.ResponseCodeEnum;
@@ -97,5 +99,42 @@ public class AuthController extends BaseController {
         }
 
         return handleResponse(request, authService::login, AuthLoginResponseVo::error);
+    }
+
+    @PostMapping("/refresh-token")
+    public ResponseEntity<AuthRefreshTokenResponseVo> refreshToken(
+            @Valid @RequestBody AuthRefreshTokenRequestDto request,
+            @RequestHeader(value = "X-API-Key", required = false) String apiKey,
+            BindingResult bindingResult
+    ) throws JsonProcessingException {
+        if  (bindingResult.hasErrors()) {
+            return handleValidationError(
+                    bindingResult,
+                    request,
+                    AuthRefreshTokenResponseVo::error
+            );
+        }
+
+        if (apiKey == null || apiKey.isBlank()) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                    .body(
+                            AuthRefreshTokenResponseVo.error(
+                                    ResponseCodeEnum.UNAUTHORIZED.getCode(),
+                                    "Header X-API-Key is required"
+                            )
+                    );
+        }
+
+        if (securityService.verifyApiKey(apiKey)) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                    .body(
+                            AuthRefreshTokenResponseVo.error(
+                                    ResponseCodeEnum.UNAUTHORIZED.getCode(),
+                                    "Invalid header X-API-Key"
+                            )
+                    );
+        }
+
+        return handleResponse(request, authService::refreshToken, AuthRefreshTokenResponseVo::error);
     }
 }

@@ -25,7 +25,9 @@ app:
   api-key: ${API_KEY:test}
 jwt:
   secret: ${JWT_SECRET:test}
-  expiration: ${JWT_EXPIRATION:3600000} # 1 hour in milliseconds
+  expiration:
+    access-token: ${JWT_ACCESS_TOKEN_EXPIRATION:3600000} # 1 hour in milliseconds
+    refresh-token: ${JWT_REFRESH_TOKEN_EXPIRATION:604800000} # 7 days in milliseconds
 redis:
   expiration:
     refresh-token: ${REDIS_REFRESH_TOKEN_EXPIRATION:604800000} # 7 days in milliseconds

@@ -29,7 +29,7 @@ public abstract class BaseController {
 
         int code = ResponseCodeEnum.INVALID_REQUEST.getCode();
 
-        log.error("handleValidationError - code: {}, message: {}, request: {}", code, message, request);
+        log.error("[handleValidationError] - code: {}, message: {}, request: {}", code, message, request);
 
         return ResponseEntity.badRequest()
                 .body(errorFactory.apply(code, message));
@@ -46,7 +46,7 @@ public abstract class BaseController {
         try {
             response = ResponseEntity.ok(serviceMethod.apply(request));
         } catch (DataIntegrityViolationException e) {
-            log.error("handleResponse - DataIntegrityViolationException", e);
+            log.error("[handleResponse] - DataIntegrityViolationException", e);
 
             response = ResponseEntity.badRequest()
                     .body(errorFactory.apply(
@@ -54,7 +54,7 @@ public abstract class BaseController {
                             ResponseCodeEnum.DUPLICATE_ENTRY.getMessage())
                     );
         } catch (ApiException e) {
-            log.error("handleResponse - AppException", e);
+            log.error("[handleResponse] - AppException", e);
 
             response = ResponseEntity.status(e.getHttpStatus())
                     .body(errorFactory.apply(
@@ -62,7 +62,7 @@ public abstract class BaseController {
                             e.getMessage())
                     );
         } catch (Exception e) {
-            log.error("handleResponse", e);
+            log.error("[handleResponse]", e);
 
             response = ResponseEntity.internalServerError()
                     .body(errorFactory.apply(
@@ -71,7 +71,7 @@ public abstract class BaseController {
                     );
         }
 
-        log.info("handleResponse - request: {}, response: {}", request, mapper.writeValueAsString(response));
+        log.info("[handleResponse] - request: {}, response: {}", request, mapper.writeValueAsString(response));
 
         return response;
     }

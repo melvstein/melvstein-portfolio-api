@@ -15,7 +15,8 @@ public enum ResponseCodeEnum {
     UNAUTHORIZED(5, "Unauthorized", HttpStatus.UNAUTHORIZED),
     INVALID_CREDENTIALS(6, "Invalid Credentials", HttpStatus.UNAUTHORIZED),
     USER_NOT_FOUND(7, "User Not Found", HttpStatus.NOT_FOUND),
-    INVALID_PASSWORD(8, "Invalid Password", HttpStatus.UNAUTHORIZED),;
+    INVALID_PASSWORD(8, "Invalid Password", HttpStatus.UNAUTHORIZED),
+    INVALID_TOKEN(9, "Invalid Token", HttpStatus.UNAUTHORIZED);
 
     private final int code;
     private final String message;

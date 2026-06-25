@@ -5,8 +5,10 @@ import dev.melvstein.portfolio.api.common.redis.service.RedisService;
 import dev.melvstein.portfolio.api.common.security.jwt.service.JwtService;
 import dev.melvstein.portfolio.api.domain.auth.converter.AuthConverter;
 import dev.melvstein.portfolio.api.domain.auth.dto.AuthLoginRequestDto;
+import dev.melvstein.portfolio.api.domain.auth.dto.AuthRefreshTokenRequestDto;
 import dev.melvstein.portfolio.api.domain.auth.dto.AuthRegisterRequestDto;
 import dev.melvstein.portfolio.api.domain.auth.vo.AuthLoginResponseVo;
+import dev.melvstein.portfolio.api.domain.auth.vo.AuthRefreshTokenResponseVo;
 import dev.melvstein.portfolio.api.domain.auth.vo.AuthRegisterResponseVo;
 import dev.melvstein.portfolio.api.domain.base.service.BaseService;
 import dev.melvstein.portfolio.api.domain.user.converter.UserConverter;
@@ -14,6 +16,7 @@ import dev.melvstein.portfolio.api.domain.user.dto.UserDto;
 import dev.melvstein.portfolio.api.common.enm.ResponseCodeEnum;
 import dev.melvstein.portfolio.api.domain.user.entity.User;
 import dev.melvstein.portfolio.api.domain.user.repository.UserRepository;
+import io.jsonwebtoken.security.SignatureException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -50,11 +53,11 @@ public class AuthService extends BaseService {
         if (cachedUser.isPresent()) {
             user = cachedUser.get();
 
-            log.info("login - User found in cache. user: {}", user);
+            log.info("[login] - User found in cache. user: {}", user);
         } else {
             user = userRepository.findByUsername(request.username())
                     .orElseThrow(() -> {
-                        log.error("login - User not found for username: {}", request.username());
+                        log.error("[login] - User not found for username: {}", request.username());
 
                         return new ApiException(ResponseCodeEnum.USER_NOT_FOUND);
                     });
@@ -68,14 +71,40 @@ public class AuthService extends BaseService {
         );
 
         if (!isMatch) {
-            log.error("login - Passwords do not match.");
+            log.error("[login] - Passwords do not match.");
 
             throw new ApiException(ResponseCodeEnum.INVALID_PASSWORD);
         }
 
-        // CACHE TOKEN
-        String token = jwtService.generateToken(user.getUsername());
+        String accessToken = jwtService.generateAccessToken(user.getUsername());
+        String refreshToken = jwtService.generateRefreshToken(user.getUsername());
 
-        return AuthLoginResponseVo.response(ResponseCodeEnum.SUCCESS, token);
+        AuthLoginResponseVo.Data data = AuthLoginResponseVo.Data.builder()
+                .accessToken(accessToken)
+                .refreshToken(refreshToken)
+                .build();
+
+        return AuthLoginResponseVo.response(ResponseCodeEnum.SUCCESS, data);
+    }
+
+    public AuthRefreshTokenResponseVo refreshToken(AuthRefreshTokenRequestDto request) {
+        String username = request.username();
+
+        try {
+            if (!jwtService.isTokenValid(request.refreshToken(), username)) {
+                return AuthRefreshTokenResponseVo.error(
+                        ResponseCodeEnum.INVALID_TOKEN.getCode(),
+                        ResponseCodeEnum.INVALID_TOKEN.getMessage()
+                );
+            }
+        } catch (SignatureException e) {
+            log.error("[refreshToken] - Invalid token.");
+
+            throw new ApiException(ResponseCodeEnum.INVALID_TOKEN);
+        }
+
+        String accessToken = jwtService.generateAccessToken(username);
+
+        return AuthRefreshTokenResponseVo.response(ResponseCodeEnum.SUCCESS, accessToken);
     }
 }
