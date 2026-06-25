@@ -4,6 +4,7 @@ import dev.melvstein.portfolio.api.common.enm.ResponseCodeEnum;
 import dev.melvstein.portfolio.api.common.exception.ApiException;
 import dev.melvstein.portfolio.api.common.redis.service.RedisService;
 import dev.melvstein.portfolio.api.common.security.jwt.service.JwtService;
+import dev.melvstein.portfolio.api.data.UserData;
 import dev.melvstein.portfolio.api.domain.auth.converter.AuthConverter;
 import dev.melvstein.portfolio.api.domain.auth.dto.AuthLoginRequestDto;
 import dev.melvstein.portfolio.api.domain.auth.dto.AuthRegisterRequestDto;
@@ -12,10 +13,9 @@ import dev.melvstein.portfolio.api.domain.auth.vo.AuthLoginResponseVo;
 import dev.melvstein.portfolio.api.domain.auth.vo.AuthRegisterResponseVo;
 import dev.melvstein.portfolio.api.domain.user.converter.UserConverter;
 import dev.melvstein.portfolio.api.domain.user.dto.UserDto;
-import dev.melvstein.portfolio.api.domain.user.enm.RoleEnum;
-import dev.melvstein.portfolio.api.domain.user.enm.StatusEnum;
 import dev.melvstein.portfolio.api.domain.user.entity.User;
 import dev.melvstein.portfolio.api.domain.user.repository.UserRepository;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -52,21 +52,20 @@ public class AuthServiceTest {
     @InjectMocks
     private AuthService authService;
 
+    private AuthRegisterRequestDto registerRequest;
+    private AuthLoginRequestDto loginRequest;
+
+    @BeforeEach
+    void setUp() {
+        registerRequest = UserData.registerRequest();
+        loginRequest = UserData.loginRequest();
+    }
+
     @Test
     void shouldRegisterSuccessfully() {
 
         // Arrange
-        AuthRegisterRequestDto request = AuthRegisterRequestDto.builder()
-                .role(RoleEnum.ADMIN)
-                .firstName("Melvin Justine")
-                .middleName("Lisay")
-                .lastName("Bayogo")
-                .username("melvstein")
-                .password("password")
-                .email("melvinbayogo@gmail.com")
-                .contactNumber("09560627650")
-                .status(StatusEnum.ACTIVE)
-                .build();
+        AuthRegisterRequestDto request = registerRequest;
 
         User user = User.builder()
                 .role(request.role())
@@ -131,17 +130,7 @@ public class AuthServiceTest {
     void shouldThrowExceptionWhenUsernameAlreadyExists() {
 
         // Arrange
-        AuthRegisterRequestDto request = AuthRegisterRequestDto.builder()
-                .role(RoleEnum.ADMIN)
-                .firstName("Melvin Justine")
-                .middleName("Lisay")
-                .lastName("Bayogo")
-                .username("melvstein")
-                .password("password")
-                .email("melvinbayogo@gmail.com")
-                .contactNumber("09560627650")
-                .status(StatusEnum.ACTIVE)
-                .build();
+        AuthRegisterRequestDto request = registerRequest;
 
         when(userRepository.existsByUsername(request.username()))
                 .thenReturn(true);
@@ -164,17 +153,7 @@ public class AuthServiceTest {
     void shouldThrowExceptionWhenEmailAlreadyExists() {
 
         // Arrange
-        AuthRegisterRequestDto request = AuthRegisterRequestDto.builder()
-                .role(RoleEnum.ADMIN)
-                .firstName("Melvin Justine")
-                .middleName("Lisay")
-                .lastName("Bayogo")
-                .username("melvstein")
-                .password("password")
-                .email("melvinbayogo@gmail.com")
-                .contactNumber("09560627650")
-                .status(StatusEnum.ACTIVE)
-                .build();
+        AuthRegisterRequestDto request = registerRequest;
 
         when(userRepository.existsByEmail(request.email()))
                 .thenReturn(true);
@@ -197,17 +176,7 @@ public class AuthServiceTest {
     void shouldThrowExceptionWhenContactNumberAlreadyExists() {
 
         // Arrange
-        AuthRegisterRequestDto request = AuthRegisterRequestDto.builder()
-                .role(RoleEnum.ADMIN)
-                .firstName("Melvin Justine")
-                .middleName("Lisay")
-                .lastName("Bayogo")
-                .username("melvstein")
-                .password("password")
-                .email("melvinbayogo@gmail.com")
-                .contactNumber("09560627650")
-                .status(StatusEnum.ACTIVE)
-                .build();
+        AuthRegisterRequestDto request = registerRequest;
 
         when(userRepository.existsByContactNumber(request.contactNumber()))
                 .thenReturn(true);
@@ -230,10 +199,7 @@ public class AuthServiceTest {
     void shouldLoginSuccessfullyWhenUserExistsInCache() {
 
         // Arrange
-        AuthLoginRequestDto request = AuthLoginRequestDto.builder()
-                .username("melvstein")
-                .password("password")
-                .build();
+        AuthLoginRequestDto request = loginRequest;
 
         User user = User.builder()
                 .username("melvstein")
@@ -270,10 +236,7 @@ public class AuthServiceTest {
     void shouldLoginSuccessfullyWhenUserExistsInDatabase() {
 
         // Arrange
-        AuthLoginRequestDto request = AuthLoginRequestDto.builder()
-                .username("melvstein")
-                .password("password")
-                .build();
+        AuthLoginRequestDto request = loginRequest;
 
         User user = User.builder()
                 .username("melvstein")
@@ -316,10 +279,7 @@ public class AuthServiceTest {
     void shouldThrowExceptionWhenUserNotFound() {
 
         // Arrange
-        AuthLoginRequestDto request = AuthLoginRequestDto.builder()
-                .username("melvstein")
-                .password("password")
-                .build();
+        AuthLoginRequestDto request = loginRequest;
 
         when(redisService.getCachedUser(request.username()))
                 .thenReturn(Optional.empty());
@@ -346,10 +306,7 @@ public class AuthServiceTest {
     void shouldThrowExceptionWhenPasswordDoesNotMatch() {
 
         // Arrange
-        AuthLoginRequestDto request = AuthLoginRequestDto.builder()
-                .username("melvstein")
-                .password("password")
-                .build();
+        AuthLoginRequestDto request = loginRequest;
 
         User user = User.builder()
                 .username("melvstein")
