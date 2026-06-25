@@ -267,7 +267,7 @@ public class AuthServiceTest {
     }
 
     @Test
-    void shouldLoginSuccessfullyWhenUserExistsInDb() {
+    void shouldLoginSuccessfullyWhenUserExistsInDatabase() {
 
         // Arrange
         AuthLoginRequestDto request = AuthLoginRequestDto.builder()
@@ -279,6 +279,9 @@ public class AuthServiceTest {
                 .username("melvstein")
                 .password("encoded-password")
                 .build();
+
+        when(redisService.getCachedUser(request.username()))
+                .thenReturn(Optional.empty());
 
         when(userRepository.findByUsername(request.username()))
             .thenReturn(Optional.of(user));
@@ -302,7 +305,75 @@ public class AuthServiceTest {
         assertEquals("access-token", response.data().accessToken());
         assertEquals("refresh-token", response.data().refreshToken());
 
+        verify(redisService)
+                .getCachedUser(request.username());
+
         verify(userRepository)
                 .findByUsername(request.username());
+    }
+
+    @Test
+    void shouldThrowExceptionWhenUserNotFound() {
+
+        // Arrange
+        AuthLoginRequestDto request = AuthLoginRequestDto.builder()
+                .username("melvstein")
+                .password("password")
+                .build();
+
+        when(redisService.getCachedUser(request.username()))
+                .thenReturn(Optional.empty());
+
+        when(userRepository.findByUsername(request.username()))
+                .thenReturn(Optional.empty());
+
+        // Assert
+        ApiException exception = assertThrows(
+                ApiException.class,
+                () -> authService.login(request)
+        );
+
+        assertEquals(
+                ResponseCodeEnum.USER_NOT_FOUND.getCode(),
+                exception.getCode()
+        );
+
+        verify(jwtService, never()).generateAccessToken(anyString());
+        verify(jwtService, never()).generateRefreshToken(anyString());
+    }
+
+    @Test
+    void shouldThrowExceptionWhenPasswordDoesNotMatch() {
+
+        // Arrange
+        AuthLoginRequestDto request = AuthLoginRequestDto.builder()
+                .username("melvstein")
+                .password("password")
+                .build();
+
+        User user = User.builder()
+                .username("melvstein")
+                .password("encoded-password")
+                .build();
+
+        when(redisService.getCachedUser(request.username()))
+                .thenReturn(Optional.of(user));
+
+        when(passwordEncoder.matches(request.password(), user.getPassword()))
+                .thenReturn(false);
+
+        // Assert
+        ApiException exception = assertThrows(
+                ApiException.class,
+                () -> authService.login(request)
+        );
+
+        assertEquals(
+                ResponseCodeEnum.INVALID_PASSWORD.getCode(),
+                exception.getCode()
+        );
+
+        verify(jwtService, never()).generateAccessToken(anyString());
+        verify(jwtService, never()).generateRefreshToken(anyString());
     }
 }
