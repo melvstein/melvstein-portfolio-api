@@ -37,6 +37,10 @@ public class AuthService extends BaseService {
     private final RedisService redisService;
 
     public AuthRegisterResponseVo register(AuthRegisterRequestDto request) {
+        if (userRepository.existsByUsername(request.username())) {
+            throw new ApiException(ResponseCodeEnum.USER_ALREADY_EXISTS);
+        }
+
         User user = authConverter.toUserEntity(request);
         UserDto userDto = userConverter.toDto(userRepository.save(user));
 
