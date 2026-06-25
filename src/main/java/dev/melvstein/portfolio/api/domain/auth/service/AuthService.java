@@ -41,6 +41,14 @@ public class AuthService extends BaseService {
             throw new ApiException(ResponseCodeEnum.USER_ALREADY_EXISTS);
         }
 
+        if (userRepository.existsByEmail(request.email())) {
+            throw new ApiException(ResponseCodeEnum.EMAIL_ALREADY_EXISTS);
+        }
+
+        if (userRepository.existsByContactNumber(request.contactNumber())) {
+            throw new ApiException(ResponseCodeEnum.CONTACT_NUMBER_ALREADY_EXISTS);
+        }
+
         User user = authConverter.toUserEntity(request);
         UserDto userDto = userConverter.toDto(userRepository.save(user));
 

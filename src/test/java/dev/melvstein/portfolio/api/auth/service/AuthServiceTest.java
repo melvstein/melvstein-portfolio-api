@@ -161,6 +161,72 @@ public class AuthServiceTest {
     }
 
     @Test
+    void shouldThrowExceptionWhenEmailAlreadyExists() {
+
+        // Arrange
+        AuthRegisterRequestDto request = AuthRegisterRequestDto.builder()
+                .role(RoleEnum.ADMIN)
+                .firstName("Melvin Justine")
+                .middleName("Lisay")
+                .lastName("Bayogo")
+                .username("melvstein")
+                .password("password")
+                .email("melvinbayogo@gmail.com")
+                .contactNumber("09560627650")
+                .status(StatusEnum.ACTIVE)
+                .build();
+
+        when(userRepository.existsByEmail(request.email()))
+                .thenReturn(true);
+
+        // Assert
+        ApiException exception = assertThrows(
+                ApiException.class,
+                () -> authService.register(request)
+        );
+
+        assertEquals(
+                ResponseCodeEnum.EMAIL_ALREADY_EXISTS.getCode(),
+                exception.getCode()
+        );
+
+        verify(userRepository, never()).save(any());
+    }
+
+    @Test
+    void shouldThrowExceptionWhenContactNumberAlreadyExists() {
+
+        // Arrange
+        AuthRegisterRequestDto request = AuthRegisterRequestDto.builder()
+                .role(RoleEnum.ADMIN)
+                .firstName("Melvin Justine")
+                .middleName("Lisay")
+                .lastName("Bayogo")
+                .username("melvstein")
+                .password("password")
+                .email("melvinbayogo@gmail.com")
+                .contactNumber("09560627650")
+                .status(StatusEnum.ACTIVE)
+                .build();
+
+        when(userRepository.existsByContactNumber(request.contactNumber()))
+                .thenReturn(true);
+
+        // Assert
+        ApiException exception = assertThrows(
+                ApiException.class,
+                () -> authService.register(request)
+        );
+
+        assertEquals(
+                ResponseCodeEnum.CONTACT_NUMBER_ALREADY_EXISTS.getCode(),
+                exception.getCode()
+        );
+
+        verify(userRepository, never()).save(any());
+    }
+
+    @Test
     void shouldLoginSuccessfullyWhenUserExistsInCache() {
 
         // Arrange
@@ -198,5 +264,45 @@ public class AuthServiceTest {
 
         verify(userRepository, never())
                 .findByUsername(anyString());
+    }
+
+    @Test
+    void shouldLoginSuccessfullyWhenUserExistsInDb() {
+
+        // Arrange
+        AuthLoginRequestDto request = AuthLoginRequestDto.builder()
+                .username("melvstein")
+                .password("password")
+                .build();
+
+        User user = User.builder()
+                .username("melvstein")
+                .password("encoded-password")
+                .build();
+
+        when(userRepository.findByUsername(request.username()))
+            .thenReturn(Optional.of(user));
+
+        when(passwordEncoder.matches(
+                request.password(),
+                user.getPassword()
+        )).thenReturn(true);
+
+        when(jwtService.generateAccessToken(user.getUsername()))
+                .thenReturn("access-token");
+
+        when(jwtService.generateRefreshToken(user.getUsername()))
+                .thenReturn("refresh-token");
+
+        // Act
+        AuthLoginResponseVo response = authService.login(request);
+
+        // Assert
+        assertNotNull(response);
+        assertEquals("access-token", response.data().accessToken());
+        assertEquals("refresh-token", response.data().refreshToken());
+
+        verify(userRepository)
+                .findByUsername(request.username());
     }
 }
