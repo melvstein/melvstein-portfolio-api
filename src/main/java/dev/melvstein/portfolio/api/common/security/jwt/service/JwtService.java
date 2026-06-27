@@ -1,6 +1,7 @@
 package dev.melvstein.portfolio.api.common.security.jwt.service;
 
 import dev.melvstein.portfolio.api.common.security.jwt.config.JwtProperties;
+import dev.melvstein.portfolio.api.common.security.jwt.enm.JwtTypeEnum;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.security.Keys;
@@ -20,9 +21,10 @@ public class JwtService {
         this.secretKey = Keys.hmacShaKeyFor(jwtProperties.secret().getBytes());
     }
 
-    public String tokenBuilder(String username, long expiration) {
+    public String tokenBuilder(JwtTypeEnum type, String username, long expiration) {
         return Jwts.builder()
                 .subject(username)
+                .claim("type", type)
                 .issuedAt(new Date())
                 .expiration(new Date(System.currentTimeMillis() + expiration))
                 .signWith(
@@ -33,11 +35,19 @@ public class JwtService {
     }
 
     public String generateAccessToken(String username) {
-        return tokenBuilder(username, jwtProperties.expiration().accessToken());
+        return tokenBuilder(
+                JwtTypeEnum.ACCESS,
+                username,
+                jwtProperties.expiration().accessToken()
+        );
     }
 
     public String generateRefreshToken(String username) {
-        return tokenBuilder(username, jwtProperties.expiration().refreshToken());
+        return tokenBuilder(
+                JwtTypeEnum.REFRESH,
+                username,
+                jwtProperties.expiration().refreshToken()
+        );
     }
 
     private Claims extractClaims(String token) {
@@ -54,6 +64,10 @@ public class JwtService {
 
     public Date extractExpiration(String token) {
         return extractClaims(token).getExpiration();
+    }
+
+    public JwtTypeEnum extractType(String token) {
+        return JwtTypeEnum.valueOf(extractClaims(token).get("type", String.class));
     }
 
     public boolean isTokenExpired(String token) {

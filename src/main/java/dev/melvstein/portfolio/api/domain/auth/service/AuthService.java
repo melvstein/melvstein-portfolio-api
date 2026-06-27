@@ -2,6 +2,7 @@ package dev.melvstein.portfolio.api.domain.auth.service;
 
 import dev.melvstein.portfolio.api.common.exception.ApiException;
 import dev.melvstein.portfolio.api.common.redis.service.RedisService;
+import dev.melvstein.portfolio.api.common.security.jwt.enm.JwtTypeEnum;
 import dev.melvstein.portfolio.api.common.security.jwt.service.JwtService;
 import dev.melvstein.portfolio.api.domain.auth.converter.AuthConverter;
 import dev.melvstein.portfolio.api.domain.auth.dto.AuthLoginRequestDto;
@@ -100,6 +101,14 @@ public class AuthService extends BaseService {
     }
 
     public AuthRefreshTokenResponseVo refreshToken(AuthRefreshTokenRequestDto request) {
+        JwtTypeEnum type = jwtService.extractType(request.refreshToken());
+
+        if (!JwtTypeEnum.REFRESH.equals(type)) {
+            log.error("[refreshToken] - Invalid refresh token. type: {}, request: {}", type, request);
+
+            throw new ApiException(ResponseCodeEnum.INVALID_TOKEN, "Invalid refresh token");
+        }
+
         String username = request.username();
 
         try {
