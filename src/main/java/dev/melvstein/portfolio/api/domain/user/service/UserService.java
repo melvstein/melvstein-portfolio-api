@@ -42,8 +42,6 @@ public class UserService extends BaseService {
     public UserResponseVo.GetAll getAllUsers(UserFilter filter, Pageable pageable) {
         Page<User> users = userRepository.findAll(UserSpecification.filter(filter), pageable);
 
-        log.info("melvstein pageUsers={}", users.getContent());
-
         List<UserDto> userDtos = users.getContent()
                 .stream()
                 .map(userConverter::toDto)
