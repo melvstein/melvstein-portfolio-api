@@ -1,7 +1,7 @@
 package dev.melvstein.portfolio.api.domain.auth.dto;
 
-import dev.melvstein.portfolio.api.domain.user.enm.RoleEnum;
-import dev.melvstein.portfolio.api.domain.user.enm.StatusEnum;
+import dev.melvstein.portfolio.api.domain.user.enm.UserRoleEnum;
+import dev.melvstein.portfolio.api.domain.user.enm.UserStatusEnum;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
@@ -12,7 +12,7 @@ import lombok.Builder;
 public record AuthRegisterRequestDto(
 
         @NotNull(message = "Role is required")
-        RoleEnum role,
+        UserRoleEnum role,
 
         @NotBlank(message = "First name is required")
         String firstName,
@@ -38,5 +38,5 @@ public record AuthRegisterRequestDto(
         String contactNumber,
 
         @NotNull(message = "Status is required")
-        StatusEnum status) {
+        UserStatusEnum status) {
 }

@@ -1,8 +1,8 @@
 package dev.melvstein.portfolio.api.domain.user.dto;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
-import dev.melvstein.portfolio.api.domain.user.enm.RoleEnum;
-import dev.melvstein.portfolio.api.domain.user.enm.StatusEnum;
+import dev.melvstein.portfolio.api.domain.user.enm.UserRoleEnum;
+import dev.melvstein.portfolio.api.domain.user.enm.UserStatusEnum;
 import lombok.Builder;
 
 import java.io.Serial;
@@ -13,14 +13,14 @@ import java.util.Date;
 public record UserDto(
 
         Long id,
-        RoleEnum role,
+        UserRoleEnum role,
         String firstName,
         String middleName,
         String lastName,
         String username,
         String email,
         String contactNumber,
-        StatusEnum status,
+        UserStatusEnum status,
 
         @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
         Date createdAt,

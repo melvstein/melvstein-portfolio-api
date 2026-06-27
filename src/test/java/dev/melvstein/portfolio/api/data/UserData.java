@@ -2,8 +2,8 @@ package dev.melvstein.portfolio.api.data;
 
 import dev.melvstein.portfolio.api.domain.auth.dto.AuthLoginRequestDto;
 import dev.melvstein.portfolio.api.domain.auth.dto.AuthRegisterRequestDto;
-import dev.melvstein.portfolio.api.domain.user.enm.RoleEnum;
-import dev.melvstein.portfolio.api.domain.user.enm.StatusEnum;
+import dev.melvstein.portfolio.api.domain.user.enm.UserRoleEnum;
+import dev.melvstein.portfolio.api.domain.user.enm.UserStatusEnum;
 import dev.melvstein.portfolio.api.domain.user.entity.User;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -17,7 +17,7 @@ public class UserData {
 
     public User get() {
         return User.builder()
-                .role(RoleEnum.ADMIN)
+                .role(UserRoleEnum.ADMIN)
                 .firstName("Melvin Justine")
                 .middleName("Lisay")
                 .lastName("Bayogo")
@@ -25,13 +25,13 @@ public class UserData {
                 .password(passwordEncoder.encode("password"))
                 .email("melvinbayogo@gmail.com")
                 .contactNumber("09560627650")
-                .status(StatusEnum.ACTIVE)
+                .status(UserStatusEnum.ACTIVE)
                 .build();
     }
 
     public static AuthRegisterRequestDto registerRequest() {
         return AuthRegisterRequestDto.builder()
-                .role(RoleEnum.ADMIN)
+                .role(UserRoleEnum.ADMIN)
                 .firstName("Melvin Justine")
                 .middleName("Lisay")
                 .lastName("Bayogo")
@@ -39,7 +39,7 @@ public class UserData {
                 .password("password")
                 .email("melvinbayogo@gmail.com")
                 .contactNumber("09560627650")
-                .status(StatusEnum.ACTIVE)
+                .status(UserStatusEnum.ACTIVE)
                 .build();
     }
 

@@ -1,7 +1,7 @@
 package dev.melvstein.portfolio.api.domain.user.entity;
 
-import dev.melvstein.portfolio.api.domain.user.enm.RoleEnum;
-import dev.melvstein.portfolio.api.domain.user.enm.StatusEnum;
+import dev.melvstein.portfolio.api.domain.user.enm.UserRoleEnum;
+import dev.melvstein.portfolio.api.domain.user.enm.UserStatusEnum;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -28,7 +28,7 @@ public class User implements Serializable {
 
     @Column(nullable = false)
     @Enumerated(EnumType.STRING)
-    private RoleEnum role;
+    private UserRoleEnum role;
 
     @Column(name = "first_name", nullable = false)
     private String firstName;
@@ -52,7 +52,7 @@ public class User implements Serializable {
     private String contactNumber;
 
     @Column(nullable = false)
-    private StatusEnum status;
+    private UserStatusEnum status;
 
     @CreatedDate
     private Instant createdAt;
