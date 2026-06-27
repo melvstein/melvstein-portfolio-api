@@ -1,6 +1,5 @@
 package dev.melvstein.portfolio.api.domain.user.converter;
 
-import dev.melvstein.portfolio.api.domain.user.dto.UserCreateRequestDto;
 import dev.melvstein.portfolio.api.domain.user.dto.UserDto;
 import dev.melvstein.portfolio.api.domain.user.entity.User;
 import lombok.RequiredArgsConstructor;
@@ -12,8 +11,6 @@ import java.util.Date;
 @Component
 @RequiredArgsConstructor
 public class UserConverter {
-
-    private final PasswordEncoder passwordEncoder;
 
     public UserDto toDto(User user) {
         if (user == null) {
@@ -52,26 +49,6 @@ public class UserConverter {
                 .status(dto.status())
                 .createdAt(dto.createdAt() != null ? dto.createdAt().toInstant() : null)
                 .updatedAt(dto.updatedAt() != null ? dto.updatedAt().toInstant() : null)
-                .build();
-    }
-    
-    public User toEntity(UserCreateRequestDto request) {
-        if (request == null) {
-            return null;
-        }
-
-        String password = passwordEncoder.encode(request.password());
-
-        return User.builder()
-                .role(request.role())
-                .firstName(request.firstName())
-                .middleName(request.middleName())
-                .lastName(request.lastName())
-                .username(request.username())
-                .password(password)
-                .email(request.email())
-                .contactNumber(request.contactNumber())
-                .status(request.status())
                 .build();
     }
 }

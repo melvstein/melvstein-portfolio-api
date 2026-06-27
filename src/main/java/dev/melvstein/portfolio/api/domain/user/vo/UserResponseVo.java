@@ -55,4 +55,37 @@ public record UserResponseVo(
                     .build();
         }
     }
+
+    @Builder
+    @JsonInclude(JsonInclude.Include.NON_EMPTY)
+    public record Update(
+
+            int code,
+            String message,
+            UserDto data
+    )  implements BaseResponseVo, Serializable {
+
+        public static Update error(int code, String message) {
+            return Update.builder()
+                    .code(code)
+                    .message(message)
+                    .build();
+        }
+    }
+
+    @Builder
+    @JsonInclude(JsonInclude.Include.NON_EMPTY)
+    public record Delete(
+
+            int code,
+            String message
+    ) implements BaseResponseVo, Serializable {
+
+        public static Delete error(int code, String message) {
+            return Delete.builder()
+                    .code(code)
+                    .message(message)
+                    .build();
+        }
+    }
 }

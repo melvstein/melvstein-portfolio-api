@@ -32,11 +32,8 @@ public class RedisService {
         return Optional.ofNullable(clazz.cast(redisTemplate.opsForValue().get(cacheKey)));
     }
 
-    public void cacheUser(User user) {
-        cache(RedisKeyPatternEnum.USER, user.getUsername(), user, redisProperties.expiration().user());
-    }
-
-    public Optional<User> getCachedUser(String username) {
-        return get(RedisKeyPatternEnum.USER, username, User.class);
+    public boolean evict(RedisKeyPatternEnum pattern, String key) {
+        String cacheKey = pattern.getPattern().formatted(key);
+        return redisTemplate.delete(cacheKey);
     }
 }

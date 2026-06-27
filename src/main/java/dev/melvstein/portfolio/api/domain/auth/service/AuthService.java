@@ -1,6 +1,7 @@
 package dev.melvstein.portfolio.api.domain.auth.service;
 
 import dev.melvstein.portfolio.api.common.exception.ApiException;
+import dev.melvstein.portfolio.api.common.redis.enm.RedisKeyPatternEnum;
 import dev.melvstein.portfolio.api.common.redis.service.RedisService;
 import dev.melvstein.portfolio.api.common.security.jwt.enm.JwtTypeEnum;
 import dev.melvstein.portfolio.api.common.security.jwt.service.JwtService;
@@ -41,7 +42,7 @@ public class AuthService extends BaseService {
     @CacheEvict(value = "users-cache", allEntries = true)
     public AuthRegisterResponseVo register(AuthRegisterRequestDto request) {
         if (userRepository.existsByUsername(request.username())) {
-            throw new ApiException(ResponseCodeEnum.USER_ALREADY_EXISTS);
+            throw new ApiException(ResponseCodeEnum.USERNAME_ALREADY_EXISTS);
         }
 
         if (userRepository.existsByEmail(request.email())) {
@@ -62,7 +63,14 @@ public class AuthService extends BaseService {
     }
 
     public AuthLoginResponseVo login(AuthLoginRequestDto request) {
-        Optional<User> cachedUser = redisService.getCachedUser(request.username());
+        RedisKeyPatternEnum redisKeyPattern = RedisKeyPatternEnum.USER_BY_USERNAME;
+
+        Optional<User> cachedUser = redisService.get(
+                redisKeyPattern,
+                request.username(),
+                User.class
+        );
+
         User user;
 
         if (cachedUser.isPresent()) {
@@ -77,7 +85,7 @@ public class AuthService extends BaseService {
                         return new ApiException(ResponseCodeEnum.USER_NOT_FOUND);
                     });
 
-            redisService.cacheUser(user);
+            redisService.cache(redisKeyPattern, request.username(), user);
         }
 
         boolean isMatch = passwordEncoder.matches(

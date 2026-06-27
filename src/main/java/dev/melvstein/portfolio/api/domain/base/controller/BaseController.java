@@ -36,6 +36,49 @@ public abstract class BaseController {
                 .body(errorFactory.apply(code, message));
     }
 
+    protected <O, T, R extends BaseResponseVo> ResponseEntity<R> handleResponse(
+            O key,
+            T request,
+            BiFunction<O, T, R> serviceMethod,
+            BiFunction<Integer, String, R> errorFactory
+    ) throws JsonProcessingException {
+        ResponseEntity<R> response;
+        ObjectMapper mapper = new ObjectMapper();
+
+        try {
+            response = ResponseEntity.ok(serviceMethod.apply(key, request));
+        } catch (DataIntegrityViolationException e) {
+            log.error("[handleResponse] - DataIntegrityViolationException", e);
+
+            response = ResponseEntity.badRequest()
+                    .body(errorFactory.apply(
+                            ResponseCodeEnum.DUPLICATE_ENTRY.getCode(),
+                            ResponseCodeEnum.DUPLICATE_ENTRY.getMessage())
+                    );
+        } catch (ApiException e) {
+            log.error("[handleResponse] - AppException", e);
+
+            response = ResponseEntity.status(e.getHttpStatus())
+                    .body(errorFactory.apply(
+                            e.getCode(),
+                            e.getMessage())
+                    );
+        } catch (Exception e) {
+            log.error("[handleResponse]", e);
+
+            response = ResponseEntity.internalServerError()
+                    .body(errorFactory.apply(
+                            ResponseCodeEnum.INTERNAL_SERVER_ERROR.getCode(),
+                            ResponseCodeEnum.INTERNAL_SERVER_ERROR.getMessage())
+                    );
+        }
+
+        log.info("[handleResponse] - key: {}, request: {}, response: {}",
+                key, request, mapper.writeValueAsString(response));
+
+        return response;
+    }
+
     protected <T, R extends BaseResponseVo> ResponseEntity<R> handleResponse(
             T request,
             Function<T, R> serviceMethod,
