@@ -12,6 +12,7 @@ public record RedisProperties(
 
     public record Expiration(
 
+            Duration defaultAll,
             Duration refreshToken,
             Duration user,
             Duration jwtToken

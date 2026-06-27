@@ -30,6 +30,7 @@ jwt:
     refresh-token: ${JWT_REFRESH_TOKEN_EXPIRATION:604800000} # 7 days in milliseconds
 redis:
   expiration:
+    default-all: ${REDIS_DEFAULT_EXPIRATION:3600000} # 1 hour in milliseconds
     refresh-token: ${REDIS_REFRESH_TOKEN_EXPIRATION:604800000} # 7 days in milliseconds
     user: ${REDIS_USER_EXPIRATION:3600000} # 1 hour in milliseconds
     jwt-token: ${REDIS_JWT_TOKEN_EXPIRATION:3600000} # 1 hour in milliseconds

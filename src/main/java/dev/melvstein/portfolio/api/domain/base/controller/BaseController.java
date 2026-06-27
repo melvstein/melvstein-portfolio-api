@@ -14,6 +14,7 @@ import org.springframework.validation.FieldError;
 import java.util.Optional;
 import java.util.function.BiFunction;
 import java.util.function.Function;
+import java.util.function.Supplier;
 
 @Slf4j
 public abstract class BaseController {
@@ -72,6 +73,46 @@ public abstract class BaseController {
         }
 
         log.info("[handleResponse] - request: {}, response: {}", request, mapper.writeValueAsString(response));
+
+        return response;
+    }
+
+    protected <R extends BaseResponseVo> ResponseEntity<R> handleResponse(
+            Supplier<R> serviceMethod,
+            BiFunction<Integer, String, R> errorFactory
+    ) throws JsonProcessingException {
+        ResponseEntity<R> response;
+        ObjectMapper mapper = new ObjectMapper();
+
+        try {
+            response = ResponseEntity.ok(serviceMethod.get());
+        } catch (DataIntegrityViolationException e) {
+            log.error("[handleResponse] - DataIntegrityViolationException", e);
+
+            response = ResponseEntity.badRequest()
+                    .body(errorFactory.apply(
+                            ResponseCodeEnum.DUPLICATE_ENTRY.getCode(),
+                            ResponseCodeEnum.DUPLICATE_ENTRY.getMessage())
+                    );
+        } catch (ApiException e) {
+            log.error("[handleResponse] - AppException", e);
+
+            response = ResponseEntity.status(e.getHttpStatus())
+                    .body(errorFactory.apply(
+                            e.getCode(),
+                            e.getMessage())
+                    );
+        } catch (Exception e) {
+            log.error("[handleResponse]", e);
+
+            response = ResponseEntity.internalServerError()
+                    .body(errorFactory.apply(
+                            ResponseCodeEnum.INTERNAL_SERVER_ERROR.getCode(),
+                            ResponseCodeEnum.INTERNAL_SERVER_ERROR.getMessage())
+                    );
+        }
+
+        log.info("[handleResponse] - response: {}", mapper.writeValueAsString(response));
 
         return response;
     }

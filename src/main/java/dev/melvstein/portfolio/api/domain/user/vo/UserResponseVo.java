@@ -3,7 +3,6 @@ package dev.melvstein.portfolio.api.domain.user.vo;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import dev.melvstein.portfolio.api.domain.base.vo.BaseResponseVo;
 import dev.melvstein.portfolio.api.domain.user.dto.UserDto;
-import dev.melvstein.portfolio.api.domain.user.entity.User;
 import lombok.Builder;
 
 import java.io.Serializable;
@@ -38,7 +37,22 @@ public record UserResponseVo(
             int totalPages,
             boolean first,
             boolean last
-    ) implements Serializable {
+    ) implements BaseResponseVo, Serializable {}
 
+    @Builder
+    @JsonInclude(JsonInclude.Include.NON_EMPTY)
+    public record GetOne(
+
+            int code,
+            String message,
+            UserDto data
+    ) implements BaseResponseVo, Serializable {
+
+        public static GetOne error(int code, String message) {
+            return GetOne.builder()
+                    .code(code)
+                    .message(message)
+                    .build();
+        }
     }
 }

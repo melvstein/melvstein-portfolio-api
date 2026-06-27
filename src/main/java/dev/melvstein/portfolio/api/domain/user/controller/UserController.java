@@ -1,5 +1,6 @@
 package dev.melvstein.portfolio.api.domain.user.controller;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import dev.melvstein.portfolio.api.domain.base.controller.BaseController;
 import dev.melvstein.portfolio.api.domain.user.repository.specification.filter.UserFilter;
 import dev.melvstein.portfolio.api.domain.user.service.UserService;
@@ -22,5 +23,12 @@ public class UserController extends BaseController {
             Pageable pageable
     ) {
         return ResponseEntity.ok(userService.getAllUsers(filter, pageable));
+    }
+
+    @GetMapping("/{userId}")
+    public ResponseEntity<UserResponseVo.GetOne> getUserById(
+            @PathVariable Long userId
+    ) throws JsonProcessingException {
+        return handleResponse(userId, userService::getUserById, UserResponseVo.GetOne::error);
     }
 }
