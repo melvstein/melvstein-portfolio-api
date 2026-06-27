@@ -20,6 +20,7 @@ import dev.melvstein.portfolio.api.domain.user.repository.UserRepository;
 import io.jsonwebtoken.security.SignatureException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -37,6 +38,7 @@ public class AuthService extends BaseService {
     private final JwtService jwtService;
     private final RedisService redisService;
 
+    @CacheEvict(value = "users-cache", allEntries = true)
     public AuthRegisterResponseVo register(AuthRegisterRequestDto request) {
         if (userRepository.existsByUsername(request.username())) {
             throw new ApiException(ResponseCodeEnum.USER_ALREADY_EXISTS);

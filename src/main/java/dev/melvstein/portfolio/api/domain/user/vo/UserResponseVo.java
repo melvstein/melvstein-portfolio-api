@@ -6,6 +6,7 @@ import dev.melvstein.portfolio.api.domain.user.dto.UserDto;
 import dev.melvstein.portfolio.api.domain.user.entity.User;
 import lombok.Builder;
 
+import java.io.Serializable;
 import java.util.List;
 
 @Builder
@@ -37,7 +38,7 @@ public record UserResponseVo(
             int totalPages,
             boolean first,
             boolean last
-    ) {
+    ) implements Serializable {
 
     }
 }

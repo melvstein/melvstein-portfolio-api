@@ -12,6 +12,7 @@ import dev.melvstein.portfolio.api.domain.user.vo.UserResponseVo;
 import jakarta.annotation.PostConstruct;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -39,6 +40,10 @@ public class UserService extends BaseService {
        //System.out.println("API_KEY " + apiKey);
     }
 
+    @Cacheable(
+            value = "users-cache",
+            key = "#filter.toString() + ':' + #pageable.pageNumber + ':' + #pageable.pageSize + ':' + #pageable.sort"
+    )
     public UserResponseVo.GetAll getAllUsers(UserFilter filter, Pageable pageable) {
         Page<User> users = userRepository.findAll(UserSpecification.filter(filter), pageable);
 
