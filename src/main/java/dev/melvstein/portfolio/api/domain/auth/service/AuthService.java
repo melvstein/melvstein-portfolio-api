@@ -22,6 +22,9 @@ import io.jsonwebtoken.security.SignatureException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -36,6 +39,7 @@ public class AuthService extends BaseService {
     private final PasswordEncoder passwordEncoder;
     private final JwtService jwtService;
     private final RedisService redisService;
+    private final AuthenticationManager authenticationManager;
 
     @CacheEvict(value = "users-cache", allEntries = true)
     public AuthRegisterResponseVo register(AuthRegisterRequestDto request) {
@@ -88,9 +92,7 @@ public class AuthService extends BaseService {
     }
 
     public AuthLoginResponseVo login(AuthLoginRequestDto request) {
-        User user = getAuthenticatedUserByUsername(request.username());
-
-        boolean isMatch = passwordEncoder.matches(
+       /* boolean isMatch = passwordEncoder.matches(
                 request.password(),
                 user.getPassword()
         );
@@ -99,8 +101,22 @@ public class AuthService extends BaseService {
             log.error("[login] - Passwords do not match.");
 
             throw new ApiException(ResponseCodeEnum.INVALID_PASSWORD);
+        }*/
+
+        try {
+            authenticationManager.authenticate(
+                    new UsernamePasswordAuthenticationToken(
+                            request.username(),
+                            request.password()
+                    )
+            );
+        } catch (AuthenticationException e) {
+            log.error("[login] - Passwords do not match.");
+
+            throw new ApiException(ResponseCodeEnum.INVALID_CREDENTIALS);
         }
 
+        User user = getAuthenticatedUserByUsername(request.username());
         String accessToken = jwtService.generateAccessToken(user.getUsername());
         String refreshToken = jwtService.generateRefreshToken(user.getUsername());
 
