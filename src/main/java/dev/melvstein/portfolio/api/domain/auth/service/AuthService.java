@@ -25,7 +25,6 @@ import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.AuthenticationException;
-import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -36,7 +35,6 @@ public class AuthService extends BaseService {
     private final UserRepository userRepository;
     private final AuthConverter authConverter;
     private final UserConverter userConverter;
-    private final PasswordEncoder passwordEncoder;
     private final JwtService jwtService;
     private final RedisService redisService;
     private final AuthenticationManager authenticationManager;
@@ -129,10 +127,9 @@ public class AuthService extends BaseService {
     }
 
     public AuthRefreshTokenResponseVo refreshToken(AuthRefreshTokenRequestDto request) {
-        JwtTypeEnum type = jwtService.extractType(request.refreshToken());
 
-        if (!JwtTypeEnum.REFRESH.equals(type)) {
-            log.error("[refreshToken] - Invalid refresh token. type: {}, request: {}", type, request);
+        if (!jwtService.isRefreshToken(request.refreshToken())) {
+            log.error("[refreshToken] - Invalid refresh token. request: {}", request);
 
             throw new ApiException(ResponseCodeEnum.INVALID_TOKEN, "Invalid refresh token");
         }

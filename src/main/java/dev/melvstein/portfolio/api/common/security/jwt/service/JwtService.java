@@ -78,4 +78,32 @@ public class JwtService {
         String extractedUsername = extractUsername(token);
         return extractedUsername.equals(username) && !isTokenExpired(token);
     }
+
+    public boolean isAccessToken(String token) {
+        return JwtTypeEnum.ACCESS.equals(extractType(token));
+    }
+
+    public boolean isRefreshToken(String token) {
+        return JwtTypeEnum.REFRESH.equals(extractType(token));
+    }
+
+    public boolean isAccessTokenValid(String token, String username) {
+        JwtTypeEnum type = extractType(token);
+
+        if (!JwtTypeEnum.ACCESS.equals(type)) {
+            return false;
+        }
+
+        return isTokenValid(token, username);
+    }
+
+    public boolean isRefreshTokenValid(String token, String username) {
+        JwtTypeEnum type = extractType(token);
+
+        if (!JwtTypeEnum.REFRESH.equals(type)) {
+            return false;
+        }
+
+        return isTokenValid(token, username);
+    }
 }
