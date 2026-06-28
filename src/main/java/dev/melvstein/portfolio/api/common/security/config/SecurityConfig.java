@@ -43,6 +43,8 @@ public class SecurityConfig {
                 )
                 .authorizeHttpRequests(authorize ->
                         authorize
+                                .requestMatchers("/actuator", "/actuator/health", "/actuator/info").permitAll()
+                                .requestMatchers("/actuator/**").hasRole("ADMIN")
                                 .requestMatchers(HttpMethod.GET, "/api/v1/users/**").permitAll()
                                 .requestMatchers(HttpMethod.POST, "/api/v1/users/**").hasRole("ADMIN")
                                 .requestMatchers(HttpMethod.PATCH, "/api/v1/users/**").permitAll()
