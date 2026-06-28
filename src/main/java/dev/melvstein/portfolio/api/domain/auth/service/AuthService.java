@@ -25,8 +25,6 @@ import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
-import java.util.Optional;
-
 @Service
 @Slf4j
 @RequiredArgsConstructor
@@ -62,31 +60,35 @@ public class AuthService extends BaseService {
         );
     }
 
-    public AuthLoginResponseVo login(AuthLoginRequestDto request) {
+    public User getAuthenticatedUserByUsername(String username) {
         RedisKeyPatternEnum redisKeyPattern = RedisKeyPatternEnum.USER_BY_USERNAME;
 
-        Optional<User> cachedUser = redisService.get(
-                redisKeyPattern,
-                request.username(),
-                User.class
-        );
+        return redisService.get(
+                        redisKeyPattern,
+                        username,
+                        User.class
+                )
+                .map(cachedUser -> {
+                    log.info("[login] - User found in cache. user: {}", cachedUser);
 
-        User user;
+                    return cachedUser;
+                })
+                .orElseGet(() -> {
+                    User findUser = userRepository.findByUsername(username)
+                            .orElseThrow(() -> {
+                                log.error("[login] - User not found for username: {}", username);
 
-        if (cachedUser.isPresent()) {
-            user = cachedUser.get();
+                                return new ApiException(ResponseCodeEnum.USER_NOT_FOUND);
+                            });
 
-            log.info("[login] - User found in cache. user: {}", user);
-        } else {
-            user = userRepository.findByUsername(request.username())
-                    .orElseThrow(() -> {
-                        log.error("[login] - User not found for username: {}", request.username());
+                    redisService.cache(redisKeyPattern, username, findUser);
 
-                        return new ApiException(ResponseCodeEnum.USER_NOT_FOUND);
-                    });
+                    return findUser;
+                });
+    }
 
-            redisService.cache(redisKeyPattern, request.username(), user);
-        }
+    public AuthLoginResponseVo login(AuthLoginRequestDto request) {
+        User user = getAuthenticatedUserByUsername(request.username());
 
         boolean isMatch = passwordEncoder.matches(
                 request.password(),

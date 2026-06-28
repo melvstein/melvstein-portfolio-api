@@ -1,0 +1,34 @@
+package dev.melvstein.portfolio.api.common.security.jwt.entrypoint;
+
+import com.fasterxml.jackson.databind.ObjectMapper;
+import dev.melvstein.portfolio.api.domain.base.vo.ApiResponseVo;
+import jakarta.servlet.ServletException;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
+import lombok.RequiredArgsConstructor;
+import org.springframework.security.core.AuthenticationException;
+import org.springframework.security.web.AuthenticationEntryPoint;
+import org.springframework.stereotype.Component;
+
+import java.io.IOException;
+
+@Component
+@RequiredArgsConstructor
+public class JwtAuthenticationEntryPoint implements AuthenticationEntryPoint {
+
+    private final ObjectMapper objectMapper;
+
+    @Override
+    public void commence(HttpServletRequest request, HttpServletResponse response, AuthenticationException authException) throws IOException, ServletException {
+
+        ApiResponseVo errorResponse = ApiResponseVo.builder()
+                .code(HttpServletResponse.SC_UNAUTHORIZED)
+                .message("Unauthorized: " + authException.getMessage())
+                .build();
+
+        response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+        response.setContentType("application/json");
+
+        objectMapper.writeValue(response.getOutputStream(), errorResponse);
+    }
+}
